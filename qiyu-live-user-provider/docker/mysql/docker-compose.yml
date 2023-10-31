@@ -1,0 +1,45 @@
+version: '3.5'
+
+services:
+  cloud-mysql-master-1:
+    image: mysql:8.0.30
+    container_name: cloud-mysql-master-1
+    command: --default-authentication-plugin=mysql_native_password --lower_case_table_names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8808:3306"
+    volumes:
+      - mysql-master-data:/var/lib/mysql
+      - mysql-master-config:/etc/mysql/conf.d
+    privileged: true
+    networks:
+      - mysql-network
+
+  cloud-mysql-slave-1:
+    image: mysql:8.0.30
+    container_name: cloud-mysql-slave-1
+    command: --default-authentication-plugin=mysql_native_password --lower_case_table_names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8809:3306"
+    volumes:
+      - mysql-slave-data:/var/lib/mysql
+      - mysql-slave-config:/etc/mysql/conf.d
+    networks:
+      - mysql-network
+    privileged: true
+    depends_on:
+      - cloud-mysql-master-1
+
+volumes:
+  mysql-master-data:
+  mysql-master-config:
+  mysql-slave-data:
+  mysql-slave-config:
+
+networks:
+  mysql-network:
+    name: mysql-network
+    driver: bridge

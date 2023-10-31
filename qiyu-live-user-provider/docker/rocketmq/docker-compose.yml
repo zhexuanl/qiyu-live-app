@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+  rmqnamesrv:
+    image: apacherocketmq/rocketmq
+    container_name: rmqnamesrv
+    command: sh mqnamesrv
+    ports:
+      - "9876:9876"
+
+  rmqbroker:
+    image: apacherocketmq/rocketmq
+    container_name: rmqbroker
+    command: sh mqbroker
+    ports:
+      - "10911:10911"
+      - "10909:10909"
+    depends_on:
+      - rmqnamesrv
+    environment:
+      - NAMESRV_ADDR=127.0.0.1:9876
+
+networks:
+  default:
+    name: rocketmq-network
+    driver: bridge

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: qiyu-live-api-application
+
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://127.0.0.1:8848?namespace=qiyu-live-test&&username=nacos&&password=nacos
+

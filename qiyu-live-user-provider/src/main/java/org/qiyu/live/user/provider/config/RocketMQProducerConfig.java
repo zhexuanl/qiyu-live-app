@@ -1,24 +1,25 @@
 package org.qiyu.live.user.provider.config;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.MQProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class RocketMQProducerConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RocketMQConsumerConfig.class);
-
-    @Resource
-    private RocketMQProducerProperties producerProperties;
+    private final RocketMQProducerProperties producerProperties;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -26,13 +27,10 @@ public class RocketMQProducerConfig {
     @Bean
     public MQProducer mqProducer() {
         ThreadPoolExecutor asyncThreadPoolExecutor = new ThreadPoolExecutor(100, 150, 3, TimeUnit.MINUTES,
-                new ArrayBlockingQueue<>(1000), new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r);
-                thread.setName(applicationName + ":rmq-producer" + ThreadLocalRandom.current().ints(1000).toString());
-                return thread;
-            }
+                new ArrayBlockingQueue<>(1000), r -> {
+            Thread thread = new Thread(r);
+            thread.setName(applicationName + ":rmq-producer" + ThreadLocalRandom.current().ints(1000).toString());
+            return thread;
         });
 
         return getMqProducer(asyncThreadPoolExecutor);
@@ -49,9 +47,9 @@ public class RocketMQProducerConfig {
             //set async send thread pool
             defaultMQProducer.setAsyncSenderExecutor(asyncThreadPoolExecutor);
             defaultMQProducer.start();
-            LOGGER.info("Start MQ producer, name server address: {}", defaultMQProducer.getNamesrvAddr());
+            log.info("Start MQ producer, name server address: {}", defaultMQProducer.getNamesrvAddr());
         } catch (MQClientException e) {
-            LOGGER.info("Error to start MQ producer, {}", e.getErrorMessage());
+            log.info("Error to start MQ producer, {}", e.getErrorMessage());
         }
         return defaultMQProducer;
     }

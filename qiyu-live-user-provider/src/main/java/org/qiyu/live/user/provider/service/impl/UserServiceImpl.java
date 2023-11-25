@@ -1,8 +1,8 @@
 package org.qiyu.live.user.provider.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Maps;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.MQProducer;
@@ -30,19 +30,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 
-    @Resource
-    private IUserMapper userMapper;
+    private final MQProducer mqProducer;
 
-    @Resource
-    private RedisTemplate<String, UserDTO> redisTemplate;
+    private final IUserMapper userMapper;
 
-    @Resource
-    private UserProviderCacheKeyBuilder userProviderCacheKeyBuilder;
+    private final RedisTemplate<String, UserDTO> redisTemplate;
 
-    @Resource
-    private MQProducer mqProducer;
+    private final UserProviderCacheKeyBuilder userProviderCacheKeyBuilder;
 
     @Override
     public UserDTO getByUserId(Long userId) {
@@ -115,7 +112,7 @@ public class UserServiceImpl implements IUserService {
         List<UserDTO> userDTOListFromCache = new ArrayList<>();
         List<Long> userIdNotInCacheList = new ArrayList<>();
 
-        for (int i = 0; i < redisResults.size(); i++) {
+        for (int i = 0; i < (redisResults != null ? redisResults.size() : 0); i++) {
             if (redisResults.get(i) != null) {
                 userDTOListFromCache.add(redisResults.get(i));
             } else {
@@ -161,7 +158,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Deprecated
-    @OldVersion(newerVersion = "batchQueryUserInfo")
+    @OldVersion(newVersion = "batchQueryUserInfo")
     public Map<Long, UserDTO> batchQueryUserInfoOld(List<Long> userIdList) {
         if (CollectionUtils.isEmpty(userIdList)) {
             return Maps.newHashMap();

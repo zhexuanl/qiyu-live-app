@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/qiyu-live-id-generate-provider/src/main/java/org/qiyu/live/id/generate/dao/mapper/IdGenerateMapper.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/cloud-mysql-master-1.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/cloud-mysql-slave-1.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/procedures/procedure_create_t_user.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/qiyu-live-user_DDL.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql/t_id_generate_config.sql" dialect="GenericSQL" />
   </component>
 </project>

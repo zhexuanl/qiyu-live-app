@@ -2,25 +2,63 @@ version: '3.5'
 
 services:
   rmqnamesrv:
-    image: apacherocketmq/rocketmq
-    container_name: rmqnamesrv
+    image: apache/rocketmq:${ROCKETMQ_VERSION}
+    container_name: mqnamesrv
+    #    restart: always
+    privileged: true
     command: sh mqnamesrv
     ports:
       - "9876:9876"
+    #    environment:
+    #      JAVA_OPT_EXT: "-server Xms1g Xmx1g"
+    networks:
+      rmq:
+        aliases:
+          - rmqnamesrv
+
 
   rmqbroker:
-    image: apacherocketmq/rocketmq
+    image: apache/rocketmq:${ROCKETMQ_VERSION}
     container_name: rmqbroker
-    command: sh mqbroker
+    #    restart: always
     ports:
       - "10911:10911"
       - "10909:10909"
     depends_on:
       - rmqnamesrv
+    volumes:
+      - store:/root/store
+      - ./conf/broker.conf:/opt/rocketmq-${ROCKETMQ_VERSION}/conf/broker.conf
+    privileged: true
+    command: sh mqbroker -c /opt/rocketmq-${ROCKETMQ_VERSION}/conf/broker.conf
     environment:
-      - NAMESRV_ADDR=127.0.0.1:9876
+      #      JAVA_OPT_EXT: "-server Xms1g Xmx1g Xmn1g"
+      NAMESRV_ADDR: rmqnamesrv:9876
+    networks:
+      rmq:
+        aliases:
+          - rmqbroker
+
+  rmqconsole:
+    image: apacherocketmq/rocketmq-dashboard
+    container_name: rocketmq-console
+    #    restart: always
+    ports:
+      - 8100:8080
+    privileged: true
+    depends_on:
+      - rmqnamesrv
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false"
+    networks:
+      rmq:
+        aliases:
+          - rmqconsole
+
+volumes:
+  store:
 
 networks:
-  default:
-    name: rocketmq-network
+  rmq:
+    name: rmq
     driver: bridge

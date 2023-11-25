@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: qiyu-live-id-generate-provider
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #访问主库
+    url: jdbc:mysql://127.0.0.1:8808/qiyu_live_common?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: root
+
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#
+#logging:
+#  level:
+#    com.chz.mapper: debug
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+  registry:
+    address: nacos://127.0.0.1:8848?namespace=qiyu-live-test&&username=nacos&&password=nacos
+  protocol:
+    name: dubbo
+    port: 9098

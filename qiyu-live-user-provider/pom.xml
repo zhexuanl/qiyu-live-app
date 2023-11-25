@@ -5,6 +5,7 @@
         <groupId>org.qiyu.live</groupId>
         <artifactId>qiyu-live-app</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>qiyu-live-user-provider</artifactId>
@@ -14,7 +15,6 @@
     <url>https://maven.apache.org</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <curator.version>2.12.0</curator.version>
 <!--       mybatis version important to avoid unsatisfied dependency-->
         <mybatis.version>3.5.3</mybatis.version>
@@ -60,7 +60,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${qiyu-mysql.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.22.2</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
             <artifactId>shardingsphere-jdbc-core</artifactId>

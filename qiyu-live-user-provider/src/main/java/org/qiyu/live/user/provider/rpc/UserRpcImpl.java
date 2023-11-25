@@ -1,6 +1,6 @@
 package org.qiyu.live.user.provider.rpc;
 
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.qiyu.live.user.dto.UserDTO;
 import org.qiyu.live.user.interfaces.IUserRpc;
@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 @DubboService
+@RequiredArgsConstructor
 public class UserRpcImpl implements IUserRpc {
 
-    @Resource
-    private IUserService userService;
+    private final IUserService userService;
 
     @Override
     public String test() {

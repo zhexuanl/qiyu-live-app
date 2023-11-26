@@ -11,12 +11,13 @@ import org.qiyu.live.id.generate.service.bo.LocalUnSeqIdBO;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 
 @Service
@@ -34,6 +35,9 @@ public class IdGenerateServiceImpl implements IdGenerateService, InitializingBea
     private static final float UPDATE_RATE = 0.75f;
     private static final int SEQ_ID = 1;
     private static final Map<Integer, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
+
+    private static final Random random = new Random();
+
 
     private final IdGenerateMapper idGenerateMapper;
 
@@ -165,6 +169,7 @@ public class IdGenerateServiceImpl implements IdGenerateService, InitializingBea
 
         int updateResult = idGenerateMapper.updateNewIdCountAndVersion(idGeneratePO.getId(), idGeneratePO.getVersion());
         if (updateResult > 0) {
+            log.info("表id段占用成功");
             localIdBOHandler(idGeneratePO);
             return;
         }
@@ -173,6 +178,7 @@ public class IdGenerateServiceImpl implements IdGenerateService, InitializingBea
             idGeneratePO = idGenerateMapper.selectById(idGeneratePO.getId());
             updateResult = idGenerateMapper.updateNewIdCountAndVersion(idGeneratePO.getId(), idGeneratePO.getVersion());
             if (updateResult > 0) {
+                log.info("表id段占用成功");
                 localIdBOHandler(idGeneratePO);
                 return;
             }
@@ -188,8 +194,12 @@ public class IdGenerateServiceImpl implements IdGenerateService, InitializingBea
     private void localIdBOHandler(IdGeneratePO idGeneratePO) {
         long currentStart = idGeneratePO.getCurrentStart();
         long nextThreshold = idGeneratePO.getNextThreshold();
+
+        log.info("Sequenced/Un-sequenced, current start: {}, next threshold: {}", currentStart, nextThreshold);
+
         long currentNum = currentStart;
         if (idGeneratePO.getIsSeq() == SEQ_ID) {
+            log.info("Is Sequence");
             AtomicLong atomicLong = new AtomicLong(currentNum);
             LocalSeqIdBO localSeqIdBO = LocalSeqIdBO.builder()
                     .id(idGeneratePO.getId())
@@ -199,22 +209,30 @@ public class IdGenerateServiceImpl implements IdGenerateService, InitializingBea
                     .build();
             localSeqIdBOMap.put(localSeqIdBO.getId(), localSeqIdBO);
         } else {
-            LocalUnSeqIdBO localUnSeqIdBO = LocalUnSeqIdBO.builder()
-                    .currentStart(currentStart)
-                    .nextThreshold(nextThreshold)
-                    .id(idGeneratePO.getId())
-                    .build();
+            log.info("Is Un-sequenced");
+            LocalUnSeqIdBO localUnSeqIdBO = new LocalUnSeqIdBO();
+            localUnSeqIdBO.setCurrentStart(currentStart);
+            localUnSeqIdBO.setNextThreshold(nextThreshold);
+            localUnSeqIdBO.setId(idGeneratePO.getId());
+
             long begin = localUnSeqIdBO.getCurrentStart();
             long end = localUnSeqIdBO.getNextThreshold();
-            List<Long> idList = new ArrayList<>();
-            for (long i = begin; i < end; i++) {
-                idList.add(i);
-            }
+            List<Long> idList = LongStream.range(begin, end).boxed().collect(Collectors.toList());
             //将本地id段提前打乱，然后放入到队列中
-            Collections.shuffle(idList);
+            this.shuffle(idList);
             ConcurrentLinkedQueue<Long> idQueue = new ConcurrentLinkedQueue<>(idList);
             localUnSeqIdBO.setIdQueue(idQueue);
             localUnSeqIdBOMap.put(localUnSeqIdBO.getId(), localUnSeqIdBO);
+        }
+    }
+
+    public <T> void shuffle(List<T> list) {
+        for (int i = list.size() - 1; i > 0; i--) {
+            int indexToSwap = random.nextInt(i + 1);
+            // Swap elements
+            T temp = list.get(i);
+            list.set(i, list.get(indexToSwap));
+            list.set(indexToSwap, temp);
         }
     }
 }

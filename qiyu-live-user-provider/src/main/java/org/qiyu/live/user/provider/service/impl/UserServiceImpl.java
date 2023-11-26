@@ -2,6 +2,7 @@ package org.qiyu.live.user.provider.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -15,7 +16,7 @@ import org.qiyu.live.framework.redis.starter.utils.RedisUtils;
 import org.qiyu.live.user.dto.UserDTO;
 import org.qiyu.live.user.provider.dao.mapper.IUserMapper;
 import org.qiyu.live.user.provider.dao.po.UserPO;
-import org.qiyu.live.user.provider.service.IUserService;
+import org.qiyu.live.user.provider.service.UserService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,13 +32,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl implements UserService {
 
     private final MQProducer mqProducer;
 
     private final IUserMapper userMapper;
 
-    private final RedisTemplate<String, UserDTO> redisTemplate;
+    @Resource
+    private RedisTemplate<String, UserDTO> redisTemplate;
 
     private final UserProviderCacheKeyBuilder userProviderCacheKeyBuilder;
 

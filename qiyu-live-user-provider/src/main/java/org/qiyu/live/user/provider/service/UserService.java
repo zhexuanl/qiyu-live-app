@@ -5,7 +5,7 @@ import org.qiyu.live.user.dto.UserDTO;
 import java.util.List;
 import java.util.Map;
 
-public interface IUserService {
+public interface UserService {
 
     UserDTO getByUserId(Long userId);
 

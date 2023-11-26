@@ -20,17 +20,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 @RequiredArgsConstructor
 public class RocketMQConsumerConfig implements InitializingBean {
 
-    private RocketMQConsumerProperties rocketMQConsumerProperties;
+    private final RocketMQConsumerProperties rocketMQConsumerProperties;
 
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    private UserProviderCacheKeyBuilder userProviderCacheKeyBuilder;
+    private final UserProviderCacheKeyBuilder userProviderCacheKeyBuilder;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     // alternative way is using @PostConstruct instead of implementing interface
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         initConsumer();
     }
 

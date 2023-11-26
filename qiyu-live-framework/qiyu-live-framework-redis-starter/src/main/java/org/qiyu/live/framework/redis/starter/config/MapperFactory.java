@@ -18,7 +18,7 @@ import java.io.Serial;
 public class MapperFactory {
 
     public static ObjectMapper newInstance() {
-        return initMapper(new ObjectMapper(), (String) null);
+        return initMapper(new ObjectMapper(), null);
     }
 
     private static ObjectMapper initMapper(ObjectMapper mapper, String classPropertyTypeName) {

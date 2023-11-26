@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.qiyu.live.user.dto.UserDTO;
 import org.qiyu.live.user.interfaces.IUserRpc;
-import org.qiyu.live.user.provider.service.IUserService;
+import org.qiyu.live.user.provider.service.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserRpcImpl implements IUserRpc {
 
-    private final IUserService userService;
+    private final UserService userService;
 
     @Override
     public String test() {

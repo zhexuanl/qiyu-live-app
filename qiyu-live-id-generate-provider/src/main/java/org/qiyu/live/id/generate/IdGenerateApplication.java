@@ -13,7 +13,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableDubbo
-public class IdGenerateApplication implements CommandLineRunner {
+public class IdGenerateApplication{
 
     @Resource
     private IdGenerateService idGenerateService;
@@ -24,11 +24,11 @@ public class IdGenerateApplication implements CommandLineRunner {
         springApplication.run(args);
     }
 
-    @Override
-    public void run(String... args) {
-        for (int i = 0; i < 2000; i++) {
-            Long id = idGenerateService.getSeqId(1);
-            System.out.println(id);
-        }
-    }
+//    @Override
+//    public void run(String... args) {
+//        for (int i = 0; i < 1000; i++) {
+//            Long id = idGenerateService.getUnSeqId(2);
+//            System.out.println(id);
+//        }
+//    }
 }
